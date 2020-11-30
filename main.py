@@ -1,5 +1,7 @@
+from geopy import distance
 import json
 import os
+from pprint import pprint
 import requests
 
 
@@ -16,22 +18,23 @@ def fetch_coordinates(apikey, place):
     return lon, lat
 
 
-place = input("Где вы находитесь? ")
-coords = fetch_coordinates(YANDEX_API_GEO, place)
-print(coords)
-
-exit()
-
 with open("data-2897-2019-01-22.json", "r", encoding="CP1251") as bar_file:
     bar_list = json.load(bar_file)
 
+place = input("Где вы находитесь? ")
+local_coords = fetch_coordinates(YANDEX_API_GEO, place)
+local_coords = (float(local_coords[1]), float(local_coords[0]))
+
+navigation_bar_list = []
+bar_limited_data = dict()
+
 for bar_data in bar_list:
 
-    bar_name = bar_data['Name']
-    bar_latitude = bar_data['geoData']['coordinates'][0]
-    bar_longitude = bar_data['geoData']['coordinates'][1]
+    bar_limited_data['title'] = bar_data['Name']
+    bar_limited_data['latitude'] = bar_data['geoData']['coordinates'][1]
+    bar_limited_data['longitude'] = bar_data['geoData']['coordinates'][0]
+    bar_limited_data['distance'] = distance.distance(local_coords, (bar_data['geoData']['coordinates'][1], bar_data['geoData']['coordinates'][0])).km
 
-    print("{} {} {}".format(bar_name, bar_latitude, bar_longitude))
+    navigation_bar_list.append(bar_limited_data.copy())
 
-
-
+pprint(navigation_bar_list)
