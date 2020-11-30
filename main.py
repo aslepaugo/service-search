@@ -39,4 +39,4 @@ for bar_data in bar_list:
 
     navigation_bar_list.append(bar_limited_data.copy())
 
-pprint(min(navigation_bar_list, key=get_bar_distance))
+pprint(sorted(navigation_bar_list, key=get_bar_distance)[0:5])
