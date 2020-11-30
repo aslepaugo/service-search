@@ -22,8 +22,9 @@ def fetch_coordinates(apikey, place):
 def get_bar_distance(navigation_bar):
     return navigation_bar['distance']
 
-def hello_world():
-    return "Hello, World!"
+def index():
+    with open('index.html') as file:
+        return file.read()
 
 with open("data-2897-2019-01-22.json", "r", encoding="CP1251") as bar_file:
     bar_list = json.load(bar_file)
@@ -48,7 +49,7 @@ bar_resulted_list = sorted(navigation_bar_list, key=get_bar_distance)[0:5]
 
 m = folium.Map(
     location=[local_coords[0], local_coords[1]],
-    zoom_start=12
+    zoom_start=16
 )
 
 for bar_data in bar_resulted_list:
@@ -61,5 +62,5 @@ for bar_data in bar_resulted_list:
 m.save('index.html')
 
 app = Flask(__name__)
-app.add_url_rule('/', 'hello', hello_world)
+app.add_url_rule('/', 'index', index)
 app.run('0.0.0.0')
