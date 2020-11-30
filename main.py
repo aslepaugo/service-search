@@ -3,6 +3,7 @@ import json
 import os
 import requests
 
+from flask import Flask
 from geopy import distance
 from pprint import pprint
 
@@ -20,6 +21,9 @@ def fetch_coordinates(apikey, place):
 
 def get_bar_distance(navigation_bar):
     return navigation_bar['distance']
+
+def hello_world():
+    return "Hello, World!"
 
 with open("data-2897-2019-01-22.json", "r", encoding="CP1251") as bar_file:
     bar_list = json.load(bar_file)
@@ -55,3 +59,7 @@ for bar_data in bar_resulted_list:
     pprint(bar_data)
 
 m.save('index.html')
+
+app = Flask(__name__)
+app.add_url_rule('/', 'hello', hello_world)
+app.run('0.0.0.0')
