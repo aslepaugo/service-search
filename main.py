@@ -17,6 +17,8 @@ def fetch_coordinates(apikey, place):
     lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
     return lon, lat
 
+def get_bar_distance(navigation_bar):
+    return navigation_bar['distance']
 
 with open("data-2897-2019-01-22.json", "r", encoding="CP1251") as bar_file:
     bar_list = json.load(bar_file)
@@ -37,4 +39,4 @@ for bar_data in bar_list:
 
     navigation_bar_list.append(bar_limited_data.copy())
 
-pprint(navigation_bar_list)
+pprint(min(navigation_bar_list, key=get_bar_distance))
