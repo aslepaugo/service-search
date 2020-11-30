@@ -1,9 +1,10 @@
-from geopy import distance
+import folium
 import json
 import os
-from pprint import pprint
 import requests
 
+from geopy import distance
+from pprint import pprint
 
 YANDEX_API_GEO = os.environ.get("YANDEX_API_GEO")
 
@@ -39,4 +40,18 @@ for bar_data in bar_list:
 
     navigation_bar_list.append(bar_limited_data.copy())
 
-pprint(sorted(navigation_bar_list, key=get_bar_distance)[0:5])
+bar_resulted_list = sorted(navigation_bar_list, key=get_bar_distance)[0:5]
+
+m = folium.Map(
+    location=[local_coords[0], local_coords[1]],
+    zoom_start=12
+)
+
+for bar_data in bar_resulted_list:
+    folium.Marker(
+        location=[bar_data['latitude'], bar_data['longitude']]
+    ).add_to(m)
+
+    pprint(bar_data)
+
+m.save('index.html')
