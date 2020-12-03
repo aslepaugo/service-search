@@ -1,4 +1,4 @@
-requests
-geopy
-folium
-Flask
+requests==2.25.*
+geopy==2.0.*
+folium==0.11.*
+Flask==1.1.*
