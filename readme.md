@@ -8,7 +8,7 @@ Script uses data from CSV file (example is availabel form data.mos.ru)
 
 ### How to install
 
-You will need to get Yandex API key []()
+You will need to get Yandex API key [developer.tech.yandex.ru](https://developer.tech.yandex.ru/services/)
 
 Set environmental variable YANDEX_API_GEO
 
@@ -21,6 +21,17 @@ Then use `pip` (or `pip3`, if there is a conflict with Python2) to install depen
 ```
 pip install -r requirements.txt
 ```
+
+
+### Prepare and run
+1. You need a file with data. In example folder you can find file with data about bars of Moscow;
+    to obtain updated version of the data please visit data.mos.ru
+2. Run main.py script with path to your file. 
+example:
+```
+python3 main.py ./example/mos.data.bar.json
+```
+
 
 ### Project Goals
 

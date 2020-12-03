@@ -2,6 +2,7 @@ import folium
 import json
 import os
 import requests
+import sys
 
 from flask import Flask
 from geopy import distance
@@ -25,9 +26,13 @@ def get_bar_distance(navigation_bar):
 def index():
     with open('index.html') as file:
         return file.read()
-
-with open("data-2897-2019-01-22.json", "r", encoding="CP1251") as bar_file:
-    bar_list = json.load(bar_file)
+try:
+    with open(sys.argv[1], "r", encoding="CP1251") as bar_file:
+        bar_list = json.load(bar_file)
+except IndexError:
+    print("Please run script with path to the data file")
+except FileNotFoundError:
+    print("File with name {} wasn't found".format(sys.argv[1]))
 
 place = input("Где вы находитесь? ")
 local_coords = fetch_coordinates(YANDEX_API_GEO, place)
