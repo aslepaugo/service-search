@@ -9,6 +9,7 @@ from geopy import distance
 from pprint import pprint
 
 YANDEX_API_GEO = os.environ.get("YANDEX_API_GEO")
+NEAREST_BARS_AMOUNT = 5
 
 def fetch_coordinates(apikey, place):
     base_url = "https://geocode-maps.yandex.ru/1.x"
@@ -53,7 +54,7 @@ for bar_data in bar_list:
 
     navigation_bar_list.append(bar_limited_data.copy())
 
-bar_resulted_list = sorted(navigation_bar_list, key=get_bar_distance)[0:5]
+bar_resulted_list = sorted(navigation_bar_list, key=get_bar_distance)[:NEAREST_BARS_AMOUNT]
 
 m = folium.Map(
     location=[local_coords[0], local_coords[1]],
