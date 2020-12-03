@@ -39,14 +39,17 @@ local_coords = fetch_coordinates(YANDEX_API_GEO, place)
 local_coords = (float(local_coords[1]), float(local_coords[0]))
 
 navigation_bar_list = []
-bar_limited_data = dict()
 
 for bar_data in bar_list:
 
-    bar_limited_data['title'] = bar_data['Name']
-    bar_limited_data['latitude'] = bar_data['geoData']['coordinates'][1]
-    bar_limited_data['longitude'] = bar_data['geoData']['coordinates'][0]
-    bar_limited_data['distance'] = distance.distance(local_coords, (bar_data['geoData']['coordinates'][1], bar_data['geoData']['coordinates'][0])).km
+    bar_limited_data = {
+        'title': bar_data['Name'],
+        'latitude': bar_data['geoData']['coordinates'][1],
+        'longitude': bar_data['geoData']['coordinates'][0],
+        'distance': distance.distance(
+            local_coords, 
+            (bar_data['geoData']['coordinates'][1], bar_data['geoData']['coordinates'][0])).km
+    }
 
     navigation_bar_list.append(bar_limited_data.copy())
 
