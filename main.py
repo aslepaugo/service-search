@@ -62,8 +62,6 @@ for bar_data in bar_resulted_list:
         location=[bar_data['latitude'], bar_data['longitude']]
     ).add_to(m)
 
-    pprint(bar_data)
-
 m.save('index.html')
 
 app = Flask(__name__)
