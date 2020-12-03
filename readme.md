@@ -25,7 +25,17 @@ pip install -r requirements.txt
 
 ### Prepare and run
 1. You need a file with data. In example folder you can find file with data about bars of Moscow;
+    
     to obtain updated version of the data please visit data.mos.ru
+
+    a) open https://data.mos.ru/opendata
+
+    b) choose category "Food Services"
+
+    c) add filters you need
+    
+    d) choose export->json
+
 2. Run main.py script with path to your file. 
 example:
 ```
