@@ -27,6 +27,8 @@ def get_bar_distance(navigation_bar):
 def index():
     with open('index.html') as file:
         return file.read()
+
+
 try:
     with open(sys.argv[1], "r", encoding="CP1251") as bar_file:
         bar_list = json.load(bar_file)
@@ -43,13 +45,16 @@ navigation_bar_list = []
 
 for bar_data in bar_list:
 
+    bar_latitude = bar_data['geoData']['coordinates'][1]
+    bar_longitude = bar_data['geoData']['coordinates'][0]
+
     bar_limited_data = {
         'title': bar_data['Name'],
-        'latitude': bar_data['geoData']['coordinates'][1],
-        'longitude': bar_data['geoData']['coordinates'][0],
+        'latitude': bar_latitude,
+        'longitude': bar_longitude,
         'distance': distance.distance(
             local_coords, 
-            (bar_data['geoData']['coordinates'][1], bar_data['geoData']['coordinates'][0])).km
+            (bar_latitude, bar_longitude)).km
     }
 
     navigation_bar_list.append(bar_limited_data.copy())
