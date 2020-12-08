@@ -1,13 +1,16 @@
+import argparse
 import folium
 import json
 import os
 import requests
+import sys
 
 from flask import Flask
 from geopy import distance
-from pprint import pprint
 
 YANDEX_API_GEO = os.environ.get("YANDEX_API_GEO")
+NEAREST_SERVICE_AMOUNT = 5
+
 
 def fetch_coordinates(apikey, place):
     base_url = "https://geocode-maps.yandex.ru/1.x"
@@ -19,48 +22,90 @@ def fetch_coordinates(apikey, place):
     lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
     return lon, lat
 
-def get_bar_distance(navigation_bar):
-    return navigation_bar['distance']
+
+def get_parsed_service_data(file_path, current_location):
+    
+    try:
+        with open(file_path, "r", encoding="CP1251") as file_context:
+            context = json.load(file_context)
+    except FileNotFoundError:
+        print("File with name {} wasn't found".format(file_path))
+
+    services = []
+
+    for service in context:
+
+        service_latitude = float(service['geoData']['coordinates'][1])
+        service_longitude = float(service['geoData']['coordinates'][0])
+
+        service_data = {
+            'title': service['Name'],
+            'latitude': service_latitude,
+            'longitude': service_longitude,
+            'distance': distance.distance(
+                (current_location['latitude'], current_location['longitude']),
+                (service_latitude, service_longitude)).km
+        }
+
+        services.append(service_data.copy())
+    
+    return services
+
+
+def get_current_location():
+    current_location_name = input("Где вы находитесь? ")
+    location_coordinates = fetch_coordinates(YANDEX_API_GEO, current_location_name)
+
+    return {
+        'latitude': location_coordinates[1],
+        'longitude': location_coordinates[0]
+    }
+
+
+def limit_services(services):
+    return sorted(
+        services,
+        key=lambda x: x['distance']
+    )[:NEAREST_SERVICE_AMOUNT]
+
+
+def render_map(current_location, services):
+    service_map = folium.Map(
+        location=[current_location['latitude'], current_location['longitude']],
+        zoom_start=16
+    )
+
+    for service in services:
+        folium.Marker(
+            location=[service['latitude'], service['longitude']]
+        ).add_to(service_map)
+
+    service_map.save('index.html')
+
 
 def index():
     with open('index.html') as file:
         return file.read()
 
-with open("data-2897-2019-01-22.json", "r", encoding="CP1251") as bar_file:
-    bar_list = json.load(bar_file)
 
-place = input("Где вы находитесь? ")
-local_coords = fetch_coordinates(YANDEX_API_GEO, place)
-local_coords = (float(local_coords[1]), float(local_coords[0]))
+def main():
 
-navigation_bar_list = []
-bar_limited_data = dict()
+    parser = argparse.ArgumentParser(
+        description="Using data about services from mos.ru script is able to retrieve 5 the most nearest"
+    )
+    parser.add_argument('-f', '--file_name', help='Path to the file with raw json', required=True)
+    args = parser.parse_args()
+    file_path = args.file_name
 
-for bar_data in bar_list:
+    current_location = get_current_location()
+    services = get_parsed_service_data(file_path, current_location) 
+    limited_services = limit_services(services)
+    render_map(current_location, limited_services)
 
-    bar_limited_data['title'] = bar_data['Name']
-    bar_limited_data['latitude'] = bar_data['geoData']['coordinates'][1]
-    bar_limited_data['longitude'] = bar_data['geoData']['coordinates'][0]
-    bar_limited_data['distance'] = distance.distance(local_coords, (bar_data['geoData']['coordinates'][1], bar_data['geoData']['coordinates'][0])).km
+    app = Flask(__name__)
+    app.add_url_rule('/', 'index', index)
+    app.run('0.0.0.0')
 
-    navigation_bar_list.append(bar_limited_data.copy())
 
-bar_resulted_list = sorted(navigation_bar_list, key=get_bar_distance)[0:5]
-
-m = folium.Map(
-    location=[local_coords[0], local_coords[1]],
-    zoom_start=16
-)
-
-for bar_data in bar_resulted_list:
-    folium.Marker(
-        location=[bar_data['latitude'], bar_data['longitude']]
-    ).add_to(m)
-
-    pprint(bar_data)
-
-m.save('index.html')
-
-app = Flask(__name__)
-app.add_url_rule('/', 'index', index)
-app.run('0.0.0.0')
+if __name__ == "__main__":
+    main()
